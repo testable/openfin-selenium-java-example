@@ -1,0 +1,13 @@
+group 'io.testable'
+version '0.1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.testable:testable-selenium-java:0.0.12'
+    testImplementation 'junit:junit:4.13'
+}
