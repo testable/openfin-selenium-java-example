@@ -23,17 +23,17 @@ public class TestableOpenFinExample {
     private static boolean IS_TESTABLE = System.getenv("OUTPUT_DIR") != null;
 
     public static void main(String[] args) throws Exception {
-        // Get the path to the config file, "binary", and chrome driver port
-        String configUrl = System.getenv("CONFIG_URL");
+        // Get the path to the config file, "binary", and chrome driver port, and the openfin remote debugger port
+        String configUrl = getenv("CONFIG_URL", System.getProperty("user.dir") + "/app_sample.json");
         String binary = Paths.get("RunOpenFin.sh").toAbsolutePath().toString();
-        String chromedriverPort = System.getenv("CHROMEDRIVER_PORT");
+        String chromedriverPort = getenv("CHROMEDRIVER_PORT", "9515");
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--config=" + (configUrl != null ? configUrl : System.getProperty("user.dir") + "/app_sample.json"));
+        options.addArguments("--config=" + configUrl);
         options.setBinary(binary);
 
         // connect to chromedriver
-        WebDriver driver = new RemoteWebDriver(new URL("http://localhost:" + (chromedriverPort != null ? chromedriverPort : "9515")),
+        WebDriver driver = new RemoteWebDriver(new URL("http://localhost:" + chromedriverPort),
                 options);
 
         try {
@@ -49,6 +49,11 @@ public class TestableOpenFinExample {
         } finally {
             exitOpenFin(driver);
         }
+    }
+
+    private static String getenv(String name, String defaultValue) {
+        String answer = System.getenv(name);
+        return answer != null && answer.length() > 0 ? name : defaultValue;
     }
 
     private static void exitOpenFin(WebDriver driver) {
