@@ -1,6 +1,7 @@
 package io.testable.examples;
 
 import io.testable.selenium.TestableSelenium;
+import io.testable.selenium.TestableTest;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -21,11 +22,12 @@ public class TestableOpenFinExample {
 
     // if the OUTPUT_DIR environment variable is defined then we are running on Testable
     private static boolean IS_TESTABLE = System.getenv("OUTPUT_DIR") != null;
+    private static boolean IS_WINDOWS = System.getProperty("os.name").startsWith("Windows");
 
     public static void main(String[] args) throws Exception {
         // Get the path to the config file, "binary", and chrome driver port, and the openfin remote debugger port
         String configUrl = getenv("CONFIG_URL", System.getProperty("user.dir") + "/app_sample.json");
-        String binary = Paths.get("RunOpenFin.sh").toAbsolutePath().toString();
+        String binary = Paths.get(IS_WINDOWS ? "RunOpenFin.bat" : "RunOpenFin.sh").toAbsolutePath().toString();
         String chromedriverPort = getenv("CHROMEDRIVER_PORT", "9515");
 
         ChromeOptions options = new ChromeOptions();
@@ -37,15 +39,24 @@ public class TestableOpenFinExample {
                 options);
 
         try {
-            // wait for OpenFin to become available
+            TestableTest test = TestableSelenium.startTest("OpenFin Demo Test");
+
+            test.startStep("Wait for the OpenFin runtime to launch");
             waitForFinDesktop(driver);
-            // switch to the main window
+            test.finishSuccessfulStep();
+
+            test.startStep("Switch to the 'Hello OpenFin' window by title");
             switchWindowByTitle(driver, "Hello OpenFin");
-            // take a screenshot
+            test.finishSuccessfulStep();
+
+            test.startStep("Take a screenshot");
             Path screenshot = TestableSelenium.takeScreenshot(driver, "main.png");
+            test.finishSuccessfulStep();
             // if it is running locally copy the screenshot to the project root directory
             if (!IS_TESTABLE)
                 Files.copy(screenshot, Paths.get("main.png"), StandardCopyOption.REPLACE_EXISTING);
+
+            test.finish();
         } finally {
             exitOpenFin(driver);
         }
@@ -53,7 +64,7 @@ public class TestableOpenFinExample {
 
     private static String getenv(String name, String defaultValue) {
         String answer = System.getenv(name);
-        return answer != null && answer.length() > 0 ? name : defaultValue;
+        return answer != null && answer.length() > 0 ? answer : defaultValue;
     }
 
     private static void exitOpenFin(WebDriver driver) {
