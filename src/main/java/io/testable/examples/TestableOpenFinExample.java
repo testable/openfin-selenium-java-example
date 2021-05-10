@@ -3,10 +3,16 @@ package io.testable.examples;
 import io.testable.selenium.TestableSelenium;
 import io.testable.selenium.TestableTest;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +20,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 /**
  * Simple example of opening the demo OpenFin app and taking a screenshot of the main window once it opens
@@ -27,12 +34,21 @@ public class TestableOpenFinExample {
     public static void main(String[] args) throws Exception {
         // Get the path to the config file, "binary", and chrome driver port, and the openfin remote debugger port
         String configUrl = getenv("CONFIG_URL", System.getProperty("user.dir") + "/app_sample.json");
-        String binary = Paths.get(IS_WINDOWS ? "RunOpenFin.bat" : "RunOpenFin.sh").toAbsolutePath().toString();
+        String chromePort = getenv("CHROME_PORT", "12565");
         String chromedriverPort = getenv("CHROMEDRIVER_PORT", "9515");
+        String debuggerAddress = "localhost:" + chromePort;
+
+        System.out.println("Launching OpenFin");
+        launchOpenFin(configUrl, chromePort);
+
+        System.out.println("Launching chromedriver with debuggerAddress=" + debuggerAddress);
+
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        logPrefs.enable(LogType.PERFORMANCE, Level.ALL);
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--config=" + configUrl);
-        options.setBinary(binary);
+        options.setExperimentalOption("debuggerAddress", debuggerAddress);
+        options.setCapability("goog:loggingPerfs", logPrefs);
 
         // connect to chromedriver
         WebDriver driver = new RemoteWebDriver(new URL("http://localhost:" + chromedriverPort),
@@ -56,10 +72,20 @@ public class TestableOpenFinExample {
             if (!IS_TESTABLE)
                 Files.copy(screenshot, Paths.get("main.png"), StandardCopyOption.REPLACE_EXISTING);
 
+            LogEntries logEntries = driver.manage().logs().get(LogType.PERFORMANCE);
+            for (LogEntry entry : logEntries) {
+                System.out.println(entry.toString());
+            }
             test.finish();
         } finally {
             exitOpenFin(driver);
         }
+    }
+
+    private static Process launchOpenFin(String configUrl, String chromePort) throws IOException {
+        ProcessBuilder builder = new ProcessBuilder("openfin", "-l", "-c", configUrl).inheritIO();
+        builder.environment().put("runtimeArgs", "--remote-debugging-port=" + chromePort);
+        return builder.start();
     }
 
     private static String getenv(String name, String defaultValue) {
@@ -100,6 +126,11 @@ public class TestableOpenFinExample {
                     driver.switchTo().window(currentWindow);
                 }
             }
+        }
+        try {
+            Integer.getInteger("TESTABLE_GLOBAL_CLIENT_INDEX")
+        } catch(Exception e) {
+
         }
         return false;
     }
