@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     implementation 'io.testable:testable-selenium-java:0.0.20'
-    implementation 'org.seleniumhq.selenium:selenium-java:3.11.0'
+    implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
     testImplementation 'junit:junit:4.13'
 }
 
