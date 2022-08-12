@@ -1,7 +1,5 @@
-plugins {
-    id "application"
-}
 apply plugin: 'java'
+apply plugin: 'application'
 
 group 'io.testable'
 version '0.1.0-SNAPSHOT'
