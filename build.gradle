@@ -11,6 +11,7 @@ repositories {
 dependencies {
     implementation 'io.testable:testable-selenium-java:0.0.20'
     implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
+    implementation 'com.google.guava:guava:23.6-jre'
     testImplementation 'junit:junit:4.13'
 }
 
