@@ -1,10 +1,10 @@
-group 'io.testable'
-version '0.1.0-SNAPSHOT'
-
 plugins {
     id "application"
 }
 apply plugin: 'java'
+
+group 'io.testable'
+version '0.1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
