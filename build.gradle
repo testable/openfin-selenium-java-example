@@ -11,3 +11,14 @@ dependencies {
     implementation 'io.testable:testable-selenium-java:0.0.15'
     testImplementation 'junit:junit:4.13'
 }
+
+task testableRunApp(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = project.getProperty("mainClass")
+}
+
+tasks.withType(JavaExec) {
+    // Assign all Java system properties from
+    // the command line to the JavaExec task.
+    systemProperties System.properties
+}
