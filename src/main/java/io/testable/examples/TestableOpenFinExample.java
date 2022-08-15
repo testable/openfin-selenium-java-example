@@ -34,7 +34,7 @@ public class TestableOpenFinExample {
 	Thread.sleep(5000);
 
         ChromeOptions options = new ChromeOptions();
-	options.addExperimentalOption("debuggerAddress", "localhost:" + port);
+	options.setExperimentalOption("debuggerAddress", "localhost:" + port);
 
         // connect to chromedriver
         WebDriver driver = new RemoteWebDriver(new URL("http://localhost:" + getenv("CHROMEDRIVER_PORT", "9515")),
