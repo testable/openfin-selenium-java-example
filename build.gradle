@@ -15,6 +15,9 @@ dependencies {
 }
 
 application {
-    systemProperties System.getProperties()
     mainClassName = "io.testable.examples.TestableOpenFinExample"
+}
+
+run {
+    systemProperties System.getProperties()
 }
