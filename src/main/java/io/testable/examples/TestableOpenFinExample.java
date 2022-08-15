@@ -23,19 +23,21 @@ public class TestableOpenFinExample {
     // if the OUTPUT_DIR environment variable is defined then we are running on Testable
     private static boolean IS_TESTABLE = System.getenv("OUTPUT_DIR") != null;
     private static boolean IS_WINDOWS = System.getProperty("os.name").startsWith("Windows");
+    private static int DEFAULT_DEBUGGING_PORT = 12565;
 
     public static void main(String[] args) throws Exception {
         // Get the path to the config file, "binary", and chrome driver port, and the openfin remote debugger port
         String configUrl = getenv("CONFIG_URL", System.getProperty("user.dir") + "/app_sample.json");
         String binary = Paths.get(IS_WINDOWS ? "RunOpenFin.bat" : "RunOpenFin.sh").toAbsolutePath().toString();
-        String chromedriverPort = getenv("CHROMEDRIVER_PORT", "9515");
+	String port = getenv("CHROME_PORT", DEFAULT_DEBUGGING_PORT);
+        Runtime.getRuntime.exec(binary + " " + configUrl + " --remote-debugging-port=" + port);
+	Thread.sleep(5000);
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--config=" + configUrl);
-        options.setBinary(binary);
+	options.addExperimentalOption("debuggerAddress", "localhost:" + port);
 
         // connect to chromedriver
-        WebDriver driver = new RemoteWebDriver(new URL("http://localhost:" + chromedriverPort),
+        WebDriver driver = new RemoteWebDriver(new URL("http://localhost:" + getenv("CHROMEDRIVER_PORT", "9515")),
                 options);
 
         try {
