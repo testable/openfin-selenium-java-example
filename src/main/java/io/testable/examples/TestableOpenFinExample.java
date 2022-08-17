@@ -31,7 +31,7 @@ public class TestableOpenFinExample {
         String binary = Paths.get(IS_WINDOWS ? "RunOpenFin.bat" : "RunOpenFin.sh").toAbsolutePath().toString();
 	String port = getenv("CHROME_PORT", DEFAULT_DEBUGGING_PORT);
         Runtime.getRuntime().exec(binary + " --config=" + configUrl + " --remote-debugging-port=" + port);
-	Thread.sleep(5000);
+	Thread.sleep(30000);
 
         ChromeOptions options = new ChromeOptions();
 	options.setExperimentalOption("debuggerAddress", "localhost:" + port);
