@@ -1,13 +1,23 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
 group 'io.testable'
 version '0.1.0-SNAPSHOT'
-
-apply plugin: 'java'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation 'io.testable:testable-selenium-java:0.0.12'
+    implementation 'io.testable:testable-selenium-java:0.0.21'
+    implementation 'com.google.guava:guava:30.1.1-jre'
     testImplementation 'junit:junit:4.13'
+}
+
+application {
+    mainClassName = "io.testable.examples.TestableOpenFinExample"
+}
+
+run {
+    systemProperties System.getProperties()
 }
